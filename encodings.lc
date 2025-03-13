@@ -1,0 +1,94 @@
+
+// COMBINATOR
+// Kestrel
+K = \xy.x;
+// Starling
+S = \xyz.(xz)(yz);
+// Identity (S K K)
+I = \x.x;
+// Bluebird (S (K S) K)
+B = \xyz.x(yz);
+// Cardinal (S (B B S) (K K))
+C = \xyz.xzy;
+// Warbler (C S I)
+W = \xy.xyy;
+// Thrush (C I)
+T = \xy.yx;
+// Vireo (B C T)
+V = \xyz.zxy;
+// Self App (S I I)
+U = \x.xx;
+
+// Once Removed
+I_ = C (C I);
+C_ = B C;
+R_ = C_ C_;
+V_ = B R_ C_;
+
+// Twiced Removed
+I__ = R_ V;
+
+// Fix (B U (C B U))
+Y = \f.(\x.f(xx))(\x.f(xx));
+// Fix (B (W I_) (V_ B (W I__)))
+Z = \f.(\x.f(\v.xxv))(\x.f(\v.xxv));
+
+// BOOL
+true = \xy.x;
+false = \xy.y;
+if = \pxy.pxy;
+&& = \pq.if p q p;
+|| = \pq.if p p q;
+! = \p.if p false true;
+
+// PAIR
+pair = \xyp.pxy;
+fst = \p.p true;
+snd = \p.p false;
+
+// CHURCH NAT
+0 = \fx.x;
+++ = \nfx.f(nfx);
+1 = ++ 0;
+2 = ++ 1;
+3 = ++ 2;
+4 = ++ 3;
+5 = ++ 4;
+6 = ++ 5;
+7 = ++ 6;
+8 = ++ 7;
+9 = ++ 8;
+isZero = \n.n (\x.false) true;
++ = \mnfx.mf(nfx);
+* = \mnfx.m(nf)x;
+^ = \mnfx.nmfx;
+prefn = \fp.pair (f (fst p)) (fst p);
+-- = \nfx.snd (n (prefn f) (pair x x));
+- = \mn.n -- m;
+geq = \mn.isZero (- n m);
+le = \mn.! (geq m n);
+leq = \mn.isZero (- m n);
+ge = \mn.! (leq m n);
+eq = \mn.&& (geq m n) (leq m n);
+
+// LIST
+[] = pair true true;
+: = \xy.pair false (pair x y);
+null = fst;
+head = \z. fst (snd z);
+tail = \z. snd (snd z);
+length = Y (\fl. if (null l) 0 (++ (f (tail l))));
+concat = Y (\flr. if (null l) r (f (tail l) (: (head l) r)));
+
+ins = Y (\fxl.(\ht.if (leq x h) (: x l) (: h (f x t)))(head l)(tail l));
+iSort = Y (\fl.if (null l) l (ins (head l) (f (tail l))));
+
+// TREE
+leaf = \nxy.xn;
+node = \lrxy.ylr;
+isLeaf = (\t.t(\x.true)(\xy.false));
+treeLeft = \t.t leaf true;
+treeRight = \t.t leaf false;
+
+// MAIN
+main = iSort (: 2 (: 1 []));
